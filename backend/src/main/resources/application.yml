@@ -40,7 +40,7 @@ spring:
   datasource:
     url: ${DB_URL:jdbc:mysql://localhost:3306/pathforgedb?createDatabaseIfNotExist=true}
     username: ${DB_USER:root}
-    password: ${DB_PASSWORD:2010G@ut}
+    password: ${DB_PASSWORD:local_password_here}
   jpa:
     hibernate:
       ddl-auto: update
@@ -48,6 +48,6 @@ spring:
 
 ai:
   provider:
-    api-key: ${AI_API_KEY:AQ.Ab8RN6LpQ8_aSzmb4kdyLaoKPOQD8jJb9HyM_YxQDp1OT6R65w}
+    api-key: ${AI_API_KEY:insert_your_gemini_key_here}
     url: ${AI_API_URL:https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent}
     model: ${AI_MODEL:gemini-3.8-flash}
