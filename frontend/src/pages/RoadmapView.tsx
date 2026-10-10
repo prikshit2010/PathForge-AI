@@ -14,7 +14,7 @@ export default function RoadmapView() {
   const [selectedNode, setSelectedNode] = useState<RoadmapNode | null>(null);
   const [tutorOpen, setTutorOpen] = useState(false);
   const [tutorQuestion, setTutorQuestion] = useState('');
-  const [tutorChat, setTutorChat] = useState<{q: string, a: string}[]>([]);
+  const [chatHistory, setChatHistory] = useState<Record<string, {q: string, a: string}[]>>({});
   const [tutorLoading, setTutorLoading] = useState(false);
 
   useEffect(() => {
@@ -39,22 +39,31 @@ export default function RoadmapView() {
     if (!tutorQuestion.trim() || !selectedNode || !data) return;
     
     const q = tutorQuestion;
+    const nodeId = selectedNode.id;
     setTutorQuestion('');
-    setTutorChat(prev => [...prev, { q, a: '' }]);
+    
+    setChatHistory(prev => ({
+      ...prev,
+      [nodeId]: [...(prev[nodeId] || []), { q, a: '' }]
+    }));
     setTutorLoading(true);
 
     try {
-      const answer = await tutorNode(data.roadmap.id, selectedNode.id, q);
-      setTutorChat(prev => {
-        const newChat = [...prev];
-        newChat[newChat.length - 1].a = answer;
-        return newChat;
+      const answer = await tutorNode(data.roadmap.id, nodeId, q);
+      setChatHistory(prev => {
+        const nodeChat = [...(prev[nodeId] || [])];
+        if (nodeChat.length > 0) {
+          nodeChat[nodeChat.length - 1].a = answer;
+        }
+        return { ...prev, [nodeId]: nodeChat };
       });
     } catch (err) {
-      setTutorChat(prev => {
-        const newChat = [...prev];
-        newChat[newChat.length - 1].a = "Failed to connect to the tutor. Please try again.";
-        return newChat;
+      setChatHistory(prev => {
+        const nodeChat = [...(prev[nodeId] || [])];
+        if (nodeChat.length > 0) {
+          nodeChat[nodeChat.length - 1].a = "Failed to connect to the tutor. Please try again.";
+        }
+        return { ...prev, [nodeId]: nodeChat };
       });
     } finally {
       setTutorLoading(false);
@@ -140,7 +149,6 @@ export default function RoadmapView() {
     if (n) {
       setSelectedNode(n);
       setTutorOpen(false);
-      setTutorChat([]);
     }
   };
 
@@ -438,7 +446,7 @@ export default function RoadmapView() {
                   </div>
                 </div>
                 
-                {tutorChat.map((msg, i) => (
+                {(chatHistory[selectedNode.id] || []).map((msg, i) => (
                   <div key={i} className="flex flex-col gap-4">
                     <div className="flex gap-3 justify-end">
                       <div className="bg-[#2563EB] text-white p-3 rounded-xl rounded-tr-none text-sm">
