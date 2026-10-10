@@ -4,6 +4,14 @@ spring:
   profiles:
     active: mysql
 
+server:
+  forward-headers-strategy: framework
+  servlet:
+    session:
+      cookie:
+        same-site: none
+        secure: true
+
 ---
 spring:
   config:
